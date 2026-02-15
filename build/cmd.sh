@@ -41,4 +41,3 @@ fi
 
 # disconnect tunnel
 tunnel_down
-
