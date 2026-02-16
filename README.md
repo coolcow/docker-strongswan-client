@@ -1,12 +1,8 @@
 # ghcr.io/coolcow/strongswan-client
 
-Simple and minimal Alpine-based Docker image for a Strongswan client.
+A minimal Alpine-based Docker image for a [strongSwan](https://www.strongswan.org/) client.
 
----
-
-## Overview
-
-This image runs `strongswan` and starts an IPsec tunnel based on configuration
+This image starts `strongswan` and brings up an IPsec tunnel using configuration
 files mounted into `/install`.
 
 ---
@@ -38,6 +34,7 @@ docker run --rm ghcr.io/coolcow/strongswan-client
 
 ```sh
 docker run -d --name strongswan-client \
+	--cap-add=NET_ADMIN \
 	-v <PATH_TO_IPSEC_CONF>:/install/ipsec.conf:ro \
 	-v <PATH_TO_IPSEC_SECRETS>:/install/ipsec.secrets:ro \
 	-e PROFILE_NAME=default \
@@ -47,8 +44,37 @@ docker run -d --name strongswan-client \
 
 ---
 
+## Configuration
+
+### Build-Time Arguments
+
+Customize the image at build time with `docker build --build-arg <KEY>=<VALUE>`.
+
+| Argument | Default | Description |
+| --- | --- | --- |
+| `ALPINE_VERSION` | `3.23.3` | Version of the Alpine base image. |
+| `ENTRYPOINTS_VERSION` | `2.0.0` | Version of the `coolcow/entrypoints` image used for shared scripts. |
+
+---
+
+## Local Testing
+
+Run the built-in smoke tests locally.
+
+1. `docker build -t ghcr.io/coolcow/strongswan-client:local-test-build -f build/Dockerfile build`
+2. `docker build --build-arg APP_IMAGE=ghcr.io/coolcow/strongswan-client:local-test-build -f build/Dockerfile.test build`
+
+---
+
 ## References
 
-- [Strongswan](https://www.strongswan.org/)
+- [strongSwan](https://www.strongswan.org/)
+- [docker-entrypoints](https://github.com/coolcow/docker-entrypoints)
+
+---
+
+## License
+
+GPL-3.0. See [LICENSE.txt](LICENSE.txt) for details.
 
 
