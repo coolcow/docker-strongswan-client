@@ -1,5 +1,5 @@
 # Global build arguments
-ARG ENTRYPOINTS_VERSION=2.0.0
+ARG ENTRYPOINTS_VERSION=2.2.0
 ARG ALPINE_VERSION=3.23.3
 
 # Stage to fetch scripts from the versioned entrypoints asset image
@@ -8,7 +8,15 @@ FROM ghcr.io/coolcow/entrypoints:${ENTRYPOINTS_VERSION} AS entrypoints
 # Main build stage
 FROM alpine:${ALPINE_VERSION}
 
-ENV PROFILE_NAME=default \
+# Runtime environment variables needed by the entrypoint scripts.
+ENV STRONGSWAN_UID=0 \
+      STRONGSWAN_GID=0 \
+      STRONGSWAN_REMAP_IDS=0 \
+      STRONGSWAN_USER=root \
+      STRONGSWAN_GROUP=root \
+      STRONGSWAN_HOME=/root \
+      STRONGSWAN_SHELL=/bin/sh \
+      PROFILE_NAME=default \
     LOCAL_IP=127.0.0.1 \
     WAIT_AFTER_START=10 \
     RECONNECT_IF_NOT= \
@@ -20,7 +28,7 @@ RUN apk --no-cache --update add \
       strongswan \
       su-exec
 
-COPY --from=entrypoints /assets/create_user_group_home.sh /usr/local/bin/
+COPY --from=entrypoints /assets/ensure_user_group_home.sh /usr/local/bin/
 COPY --from=entrypoints /assets/entrypoint_su-exec.sh /usr/local/bin/
 
 COPY charon-logging.conf /etc/strongswan.d/charon-logging.conf
